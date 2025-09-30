@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>수업 끝내기 타이머</title>
+  <style>
+    @font-face {
+      font-family: 'JejuStoneWall';
+      src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2210-EF@1.0/EF_jejudoldam.woff2') format('woff2');
+      font-weight: normal;
+      font-display: swap;
+    }
+    body {
+      margin: 0;
+      background: #000;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .title {
+      color: #F6C85F;
+      font-size: 2.5rem;
+      font-weight: bold;
+      text-align: center;
+      letter-spacing: 1px;
+      margin-bottom: 28px;
+      font-family: 'JejuStoneWall', sans-serif;
+    }
+    .controls {
+      display: flex;
+      gap: 18px;
+      justify-content: flex-start;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    select, button {
+      padding: 8px 18px;
+      border-radius: 20px;
+      border: none;
+      font-size: 1.05rem;
+      background: #F6C85F;
+      color: #333;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 0 2px;
+    }
+    button:active {
+      background: #4DC7B2;
+      color: #fff;
+    }
+    .timer {
+      font-size: 2rem;
+      margin-bottom: 18px;
+      color: #3366CC;
+      font-family: 'Arial Black', Arial, sans-serif;
+      animation: blink 1s infinite alternate;
+    }
+    @keyframes blink {
+      0% { text-shadow: 0 0 8px #F6C85F; }
+      100% { text-shadow: none; }
+    }
+    .cat-image {
+      width: 300px;
+      height: 300px;
+      object-fit: cover;
+      object-position: center;
+      margin: 0 auto 18px;
+      background: #fff;
+      transition: transform 0.5s;
+      display: block;
+    }
+    .cat-image.active {
+      transform: scale(1.05) rotate(-2deg);
+    }
+    .farewell {
+      font-size: 2rem;
+      color: #F6C85F;
+      margin: 36px 0 0 0;
+      opacity: 0;
+      transition: opacity 1s;
+      text-align: center;
+    }
+    .hide { display: none; }
+
+    .progress-bar {
+      width: 310px;
+      height: 12px;
+      border-radius: 6px;
+      background: #BBECEA;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+    .progress {
+      height: 100%;
+      background: #3366CC;
+      transition: width 0.5s;
+    }
+  </style>
+</head>
+<body>
+  <div class="title">수업 끝내기 타이머</div>
+  <div class="controls">
+    <select id="secondSelector">
+      <option value="5">5초</option>
+      <option value="10" selected>10초</option>
+      <option value="15">15초</option>
+      <option value="20">20초</option>
+    </select>
+    <button id="startBtn">시작</button>
+    <button id="pauseBtn">일시정지</button>
+  </div>
+  <div class="progress-bar">
+    <div class="progress" id="progress"></div>
+  </div>
+  <div class="timer" id="timer">10</div>
+  <img class="cat-image" id="catImage" src="" alt="고양이짤">
+  <div class="farewell" id="farewell">야옹~ 수업 끗!</div>
+  <audio id="doneSound" src="endalarm.mp3"></audio>
+  <script>
+    const catImages = [
+      "jjal1.jpg",
+      "jjal2.JPG",
+      "jjal3.JPG",
+      "jjal4.JPG",
+      "jjal5.JPG",
+      "jjal6.JPG",
+      "jjal7.JPG",
+      "jjal8.JPG",
+      "jjal9.JPG",
+      "jjal10.JPG"
+    ];
+    let totalSeconds = 10;
+    let seconds = totalSeconds;
+    let timerInterval = null;
+    let started = false;
+    let paused = false;
+    let imageIndex = 0;
+    let unlocked = false;
+
+    const timer = document.getElementById('timer');
+    const catImage = document.getElementById('catImage');
+    const farewell = document.getElementById('farewell');
+    const progress = document.getElementById('progress');
+    const secondSelector = document.getElementById('secondSelector');
+    const startBtn = document.getElementById('startBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const doneSound = document.getElementById('doneSound');
+
+    function unlockAudio() {
+      if (unlocked) return;
+      doneSound.volume = 0;
+      doneSound.play().then(() => {
+        doneSound.pause();
+        doneSound.currentTime = 0;
+        doneSound.volume = 1.0;
+        unlocked = true;
+      });
+    }
+
+    function updateTimer() {
+      timer.textContent = seconds;
+      const percent = ((totalSeconds - seconds) / totalSeconds) * 100;
+      progress.style.width = percent + "%";
+    }
+
+    function showCatImage() {
+      catImage.src = catImages[imageIndex % catImages.length];
+      catImage.style.display = "block";
+      catImage.classList.add("active");
+      setTimeout(() => catImage.classList.remove("active"), 200);
+      imageIndex++;
+    }
+
+    function hideFarewell() {
+      farewell.classList.add('hide');
+      farewell.style.opacity = 0;
+    }
+
+    function playDoneSound() {
+      doneSound.currentTime = 0;
+      doneSound.volume = 1.0;
+      doneSound.play();
+    }
+
+    function startTimer() {
+      if (started) return;
+      started = true;
+      paused = false;
+      hideFarewell();
+      timer.textContent = seconds;
+      imageIndex = 0;
+      showCatImage();
+      timerInterval = setInterval(() => {
+        if (!paused && seconds > 0) {
+          seconds--;
+          updateTimer();
+          showCatImage();
+          if (seconds === 0) {
+            clearInterval(timerInterval);
+            catImage.style.display = "none";
+            farewell.style.opacity = 1;
+            playDoneSound();
+            setTimeout(hideFarewell, 2500);
+            started = false;
+          }}}, 1000);
+    }
+
+    function pauseTimer() {
+      paused = true;
+    }
+
+    function resetTimer(newSeconds) {
+      clearInterval(timerInterval);
+      started = false;
+      paused = false;
+      seconds = newSeconds;
+      totalSeconds = newSeconds;
+      imageIndex = 0;
+      updateTimer();
+      showCatImage();
+      hideFarewell();
+      catImage.style.display = "block";
+    }
+
+    secondSelector.addEventListener('change', function () {
+      resetTimer(parseInt(this.value, 10));
+    });
+
+    startBtn.addEventListener('click', function () {
+      unlockAudio();
+      if (!started) startTimer();
+      else paused = false;
+    });
+
+    pauseBtn.addEventListener('click', pauseTimer);
+
+    updateTimer();
+    showCatImage();
+  </script>
+</body>
+</html>
+
+
+
+
+
