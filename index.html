@@ -26,7 +26,14 @@
       font-weight: bold;
       text-align: center;
       letter-spacing: 1px;
-      margin-bottom: 28px;
+      margin-bottom: 10px;
+      font-family: 'JejuStoneWall', sans-serif;
+    }
+    .subtitle {
+      color: #F6C85F;
+      font-size: 1.12rem;
+      text-align: center;
+      margin-bottom: 14px;
       font-family: 'JejuStoneWall', sans-serif;
     }
     .controls {
@@ -102,6 +109,7 @@
 </head>
 <body>
   <div class="title">수업 끝내기 타이머</div>
+  <div class="subtitle">교수님을 놀래키게 소리를 켜주세요!</div>
   <div class="controls">
     <select id="secondSelector">
       <option value="5">5초</option>
@@ -121,16 +129,8 @@
   <audio id="doneSound" src="endalarm.mp3"></audio>
   <script>
     const catImages = [
-      "jjal1.jpg",
-      "jjal2.JPG",
-      "jjal3.JPG",
-      "jjal4.JPG",
-      "jjal5.JPG",
-      "jjal6.JPG",
-      "jjal7.JPG",
-      "jjal8.JPG",
-      "jjal9.JPG",
-      "jjal10.JPG"
+      "jjal1.jpg", "jjal2.JPG", "jjal3.JPG", "jjal4.JPG", "jjal5.JPG",
+      "jjal6.JPG", "jjal7.JPG", "jjal8.JPG", "jjal9.JPG", "jjal10.JPG"
     ];
     let totalSeconds = 10;
     let seconds = totalSeconds;
@@ -242,6 +242,7 @@
   </script>
 </body>
 </html>
+
 
 
 
